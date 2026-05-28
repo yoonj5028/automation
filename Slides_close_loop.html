@@ -1,0 +1,1004 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CH512 Microfluidic — AlphaGo Analogy</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+:root {
+  --teal:#1D9E75;--teal-l:#E1F5EE;--teal-d:#085041;
+  --purple:#7F77DD;--purple-l:#EEEDFE;--purple-d:#3C3489;
+  --coral:#D85A30;--coral-l:#FAECE7;--coral-d:#712B13;
+  --amber:#BA7517;--amber-l:#FAEEDA;--amber-d:#633806;
+  --gray:#888780;--gray-l:#F1EFE8;--gray-d:#444441;
+  --ink:#1a1a18;--white:#ffffff;
+  --border:rgba(0,0,0,0.09);
+  --font-body:'DM Sans',sans-serif;
+  --font-mono:'DM Mono',monospace;
+  --radius:10px;--radius-sm:6px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:var(--font-body);background:#fff;color:var(--ink);display:flex;flex-direction:column;align-items:center;padding:32px 16px 80px;}
+
+/* ── slide shell ── */
+.slide-wrap{width:100%;max-width:920px;margin-bottom:52px;}
+.slide-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.slide-counter{font-size:11px;font-family:var(--font-mono);color:var(--gray);letter-spacing:.06em;}
+.slide-dots{display:flex;gap:6px;}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--gray-l);border:1px solid var(--gray);}
+.dot.on{background:var(--ink);border-color:var(--ink);}
+.slide{width:100%;background:#fff;border:1px solid var(--border);border-radius:16px;padding:40px 44px;min-height:480px;display:flex;flex-direction:column;box-shadow:0 2px 16px rgba(0,0,0,.05);position:relative;overflow:hidden;}
+.slide-badge{position:absolute;top:28px;right:36px;font-size:10px;font-family:var(--font-mono);font-weight:500;color:var(--gray);letter-spacing:.08em;text-transform:uppercase;}
+.eyebrow{font-size:11px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--gray);margin-bottom:10px;}
+.slide-title{font-size:26px;font-weight:600;line-height:1.2;letter-spacing:-.4px;margin-bottom:6px;}
+.slide-sub{font-size:13px;color:var(--gray);margin-bottom:26px;line-height:1.5;}
+
+/* ── shared atoms ── */
+.tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:500;}
+.tag.teal{background:var(--teal-l);color:var(--teal-d);}
+.tag.purple{background:var(--purple-l);color:var(--purple-d);}
+.tag.amber{background:var(--amber-l);color:var(--amber-d);}
+.tag.coral{background:var(--coral-l);color:var(--coral-d);}
+.tag.gray{background:var(--gray-l);color:var(--gray-d);}
+.callout-bar{background:var(--amber-l);border:1px solid var(--amber);border-radius:8px;padding:12px 16px;font-size:12px;color:var(--amber-d);line-height:1.6;margin-top:18px;}
+.callout-bar strong{font-weight:600;}
+button{font-family:var(--font-body);font-size:12px;font-weight:500;padding:7px 16px;border-radius:8px;border:1px solid var(--border);background:#fff;color:var(--ink);cursor:pointer;transition:background .12s,transform .1s;}
+button:hover{background:var(--gray-l);}
+button:active{transform:scale(.97);}
+button.primary{background:var(--ink);color:#fff;border-color:var(--ink);}
+button.primary:hover{background:var(--gray-d);}
+button.danger{background:#FCEBEB;border-color:#E24B4A;color:#791F1F;}
+
+/* ══ SLIDE 1 — principles ══ */
+.principles{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;flex:1;}
+.pcard{border-radius:10px;border:1px solid var(--border);padding:18px 16px;display:flex;flex-direction:column;gap:8px;transition:transform .15s;}
+.pcard:hover{transform:translateY(-2px);}
+.picon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:17px;margin-bottom:2px;}
+.pcard h3{font-size:13px;font-weight:600;}
+.pcard p{font-size:12px;line-height:1.6;}
+.pcard.ct{background:var(--teal-l);border-color:var(--teal);}
+.pcard.ct .picon{background:var(--teal);color:#fff;}
+.pcard.ct h3,.pcard.ct p{color:var(--teal-d);}
+.pcard.cp{background:var(--purple-l);border-color:var(--purple);}
+.pcard.cp .picon{background:var(--purple);color:#fff;}
+.pcard.cp h3,.pcard.cp p{color:var(--purple-d);}
+.pcard.ca{background:var(--amber-l);border-color:var(--amber);}
+.pcard.ca .picon{background:var(--amber);color:#fff;}
+.pcard.ca h3,.pcard.ca p{color:var(--amber-d);}
+
+/* ══ SLIDE 2 — mapping table ══ */
+.mapping-table{width:100%;border-collapse:collapse;flex:1;font-size:13px;}
+.mapping-table thead tr{border-bottom:2px solid var(--ink);}
+.mapping-table thead th{padding:8px 12px;text-align:left;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--gray);}
+.mapping-table tbody tr{border-bottom:1px solid var(--border);transition:background .12s;}
+.mapping-table tbody tr:hover{background:var(--gray-l);}
+.mapping-table td{padding:12px 12px;vertical-align:middle;line-height:1.4;}
+.mapping-table td:first-child{color:var(--gray-d);font-weight:500;}
+.arrow-col{color:var(--gray);font-size:16px;text-align:center;padding:0 4px;}
+
+/* ══ SLIDE 3 — interactive comparison ══ */
+.s3-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;flex:1;}
+.s3-panel{border-radius:12px;border:1px solid var(--border);padding:18px;display:flex;flex-direction:column;gap:10px;}
+.s3-panel.go-panel{border-color:#e8b800;background:#fffdf0;}
+.s3-panel.ch-panel{border-color:var(--purple);background:var(--purple-l);}
+.s3-panel-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;}
+.s3-panel-title{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;}
+.s3-panel-title.go{color:#7a5500;}
+.s3-panel-title.ch{color:var(--purple-d);}
+.cycle-badge{font-size:10px;font-family:var(--font-mono);padding:2px 8px;border-radius:4px;font-weight:500;}
+.cycle-badge.go{background:#f0c860;color:#7a5500;}
+.cycle-badge.ch{background:var(--purple-l);color:var(--purple-d);border:1px solid var(--purple);}
+/* go board */
+.go-board{background:#dcb660;border-radius:8px;padding:10px;position:relative;cursor:crosshair;}
+.go-grid-inner{display:grid;gap:0;}
+.go-cell-wrap{position:relative;display:flex;align-items:center;justify-content:center;}
+.go-stone{width:80%;height:80%;border-radius:50%;transition:all .2s;}
+.go-stone.empty{background:transparent;}
+.go-stone.black{background:radial-gradient(circle at 35% 35%,#555,#111);}
+.go-stone.white{background:radial-gradient(circle at 35% 35%,#fff,#ccc);border:1px solid #999;}
+.go-stone.new-b{background:radial-gradient(circle at 35% 35%,#888,#333);box-shadow:0 0 0 3px var(--amber);}
+.go-stone.new-w{background:radial-gradient(circle at 35% 35%,#fffde0,#e8d880);border:1px solid #c8a800;box-shadow:0 0 0 3px var(--amber);}
+/* board lines */
+.go-board-lines{position:absolute;top:10px;left:10px;right:10px;bottom:10px;pointer-events:none;}
+/* chamber canvas */
+#chamberCanvas3{display:block;cursor:crosshair;border-radius:6px;border:1px solid var(--purple);}
+.s3-info{font-size:11px;line-height:1.7;color:var(--gray-d);}
+.s3-info strong{color:var(--ink);}
+.s3-stat-row{display:flex;gap:8px;margin-top:6px;}
+.s3-stat{flex:1;background:rgba(255,255,255,.7);border-radius:6px;padding:6px 10px;text-align:center;}
+.s3-stat .sv{font-size:18px;font-weight:600;}
+.s3-stat .sl{font-size:10px;color:var(--gray);}
+.s3-btns{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;}
+.diff-callout{margin-top:16px;background:var(--coral-l);border:1px solid var(--coral);border-radius:8px;padding:12px 16px;font-size:12px;color:var(--coral-d);line-height:1.6;}
+.diff-callout strong{font-weight:600;display:block;margin-bottom:3px;}
+
+/* ══ SLIDE 4 — loop + chamber canvas (from uploaded) ══ */
+.analogy-row{display:grid;grid-template-columns:1fr 60px 1fr;align-items:center;gap:0;margin-bottom:28px;}
+.analogy-panel{border-radius:var(--radius);border:1px solid var(--border);padding:20px 18px;}
+.analogy-panel.left{background:var(--gray-l);border-color:var(--gray);}
+.analogy-panel.right{background:var(--purple-l);border-color:var(--purple);}
+.analogy-panel h3{font-size:15px;font-weight:600;margin-bottom:4px;}
+.analogy-panel.left h3{color:var(--gray-d);}
+.analogy-panel.right h3{color:var(--purple-d);}
+.analogy-panel .big{font-size:20px;font-weight:600;margin-bottom:10px;}
+.analogy-panel.left .big{color:var(--gray-d);}
+.analogy-panel.right .big{color:var(--purple-d);}
+.analogy-panel ul{list-style:none;font-size:12px;line-height:1.9;}
+.analogy-panel.left ul{color:var(--gray-d);}
+.analogy-panel.right ul{color:var(--purple-d);}
+.analogy-panel ul li.key{font-weight:600;margin-top:6px;}
+.vs-badge{display:flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:50%;background:var(--white);border:1px solid var(--border);font-size:18px;color:var(--gray);margin:0 auto;}
+.loop-steps{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:24px;}
+.loop-step{border-radius:var(--radius-sm);border:1px solid var(--border);padding:12px 8px 10px;text-align:center;transition:border-color .3s,background .3s;}
+.loop-step .num{display:inline-block;width:20px;height:20px;border-radius:50%;font-size:10px;font-weight:600;font-family:var(--font-mono);line-height:20px;margin-bottom:6px;background:var(--gray-l);color:var(--gray-d);}
+.loop-step h4{font-size:12px;font-weight:600;color:var(--gray-d);margin-bottom:2px;}
+.loop-step p{font-size:10.5px;color:var(--gray);}
+.loop-step.active.s1{background:var(--teal-l);border-color:var(--teal);}
+.loop-step.active.s1 .num{background:var(--teal);color:#fff;}
+.loop-step.active.s1 h4{color:var(--teal-d);}
+.loop-step.active.s1 p{color:var(--teal);}
+.loop-step.active.s2{background:var(--purple-l);border-color:var(--purple);}
+.loop-step.active.s2 .num{background:var(--purple);color:#fff;}
+.loop-step.active.s2 h4{color:var(--purple-d);}
+.loop-step.active.s2 p{color:var(--purple);}
+.loop-step.active.s3{background:var(--amber-l);border-color:var(--amber);}
+.loop-step.active.s3 .num{background:var(--amber);color:#fff;}
+.loop-step.active.s3 h4{color:var(--amber-d);}
+.loop-step.active.s3 p{color:var(--amber);}
+.loop-step.active.s4{background:var(--coral-l);border-color:var(--coral);}
+.loop-step.active.s4 .num{background:var(--coral);color:#fff;}
+.loop-step.active.s4 h4{color:var(--coral-d);}
+.loop-step.active.s4 p{color:var(--coral);}
+.loop-step.active.s5{background:var(--gray-l);border-color:var(--gray-d);}
+.loop-step.active.s5 .num{background:var(--gray-d);color:#fff;}
+.loop-step.active.s5 h4{color:var(--gray-d);}
+.loop-step.active.s5 p{color:var(--gray-d);}
+.grid-section{display:grid;grid-template-columns:auto 1fr;gap:28px;align-items:start;}
+#chamberCanvas4{display:block;cursor:crosshair;border-radius:var(--radius-sm);border:1px solid var(--border);}
+.stat-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:8px;}
+.stat-card .s-label{font-size:11px;color:var(--gray);margin-bottom:3px;}
+.stat-card .s-val{font-size:22px;font-weight:600;}
+.stat-card .s-sub{font-size:10.5px;color:var(--gray);margin-top:1px;}
+.stat-card .teal-val{color:var(--teal);}
+.stat-card .purple-val{color:var(--purple);}
+.legend{display:flex;flex-direction:column;gap:6px;margin-bottom:16px;}
+.leg{display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--gray-d);}
+.leg-dot{width:12px;height:12px;border-radius:3px;flex-shrink:0;}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;}
+.cycle-label{font-size:12px;color:var(--gray);font-family:var(--font-mono);margin-bottom:10px;min-height:18px;}
+.callout{background:var(--amber-l);border:1px solid var(--amber);border-radius:var(--radius);padding:14px 18px;margin-top:20px;}
+.callout strong{font-size:13px;color:var(--amber-d);display:block;margin-bottom:3px;}
+.callout p{font-size:12px;color:var(--amber-d);line-height:1.6;}
+
+/* ══ SLIDE 5 — pipeline (from uploaded Figure 1) ══ */
+.pc-row{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:center;gap:0;margin-bottom:28px;}
+.pc-box{border-radius:var(--radius);border:1px solid var(--border);padding:18px 16px;position:relative;}
+.pc-box.teal{background:var(--teal-l);border-color:var(--teal);}
+.pc-box.purple{background:var(--purple-l);border-color:var(--purple);}
+.pc-box.coral{background:var(--coral-l);border-color:var(--coral);}
+.pc-box h3{font-size:14px;font-weight:600;margin-bottom:3px;}
+.pc-box.teal h3{color:var(--teal-d);}
+.pc-box.purple h3{color:var(--purple-d);}
+.pc-box.coral h3{color:var(--coral-d);}
+.pc-box .role{font-size:11px;font-weight:500;margin-bottom:8px;opacity:.7;}
+.pc-box.teal .role{color:var(--teal-d);}
+.pc-box.purple .role{color:var(--purple-d);}
+.pc-box.coral .role{color:var(--coral-d);}
+.pc-box ul{list-style:none;font-size:11.5px;line-height:1.7;}
+.pc-box.teal ul{color:var(--teal-d);}
+.pc-box.purple ul{color:var(--purple-d);}
+.pc-box.coral ul{color:var(--coral-d);}
+.pc-connector{display:flex;flex-direction:column;align-items:center;gap:4px;padding:0 12px;position:relative;}
+.pc-connector::before{content:'';position:absolute;top:50%;left:0;right:0;height:1px;background:var(--border);transform:translateY(-50%);}
+.pc-connector .file-tag{background:var(--white);border:1px solid var(--border);border-radius:4px;font-size:10px;font-family:var(--font-mono);padding:2px 6px;white-space:nowrap;position:relative;z-index:1;}
+.pc-connector .arrow-line{width:100%;height:1px;background:linear-gradient(90deg,var(--border),var(--gray-d));position:relative;}
+.pc-connector .arrow-line::after{content:'›';position:absolute;right:-2px;top:-9px;font-size:16px;color:var(--gray-d);}
+.pipeline{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:12px;}
+.pipe-step{border-radius:var(--radius-sm);border:1px solid var(--border);padding:12px 10px;text-align:center;position:relative;transition:transform .15s,box-shadow .15s;cursor:default;}
+.pipe-step:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.08);}
+.pipe-step.teal{background:var(--teal-l);border-color:var(--teal);}
+.pipe-step.purple{background:var(--purple-l);border-color:var(--purple);}
+.pipe-step.amber{background:var(--amber-l);border-color:var(--amber);}
+.pipe-step.coral{background:var(--coral-l);border-color:var(--coral);}
+.pipe-step.gray{background:var(--gray-l);border-color:var(--gray);}
+.pipe-step .step-num{font-size:10px;font-weight:600;font-family:var(--font-mono);margin-bottom:6px;opacity:.5;}
+.pipe-step h4{font-size:12px;font-weight:600;margin-bottom:3px;}
+.pipe-step p{font-size:10.5px;line-height:1.5;opacity:.75;}
+.pipe-step.teal h4,.pipe-step.teal p{color:var(--teal-d);}
+.pipe-step.purple h4,.pipe-step.purple p{color:var(--purple-d);}
+.pipe-step.amber h4,.pipe-step.amber p{color:var(--amber-d);}
+.pipe-step.coral h4,.pipe-step.coral p{color:var(--coral-d);}
+.pipe-step.gray h4,.pipe-step.gray p{color:var(--gray-d);}
+.feedback-arc{text-align:center;font-size:11px;color:var(--gray);padding:8px 0 0;display:flex;align-items:center;justify-content:center;gap:8px;}
+.feedback-arc::before,.feedback-arc::after{content:'';flex:1;height:1px;border-top:1px dashed var(--gray);opacity:.5;}
+.handshake{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:24px;}
+.hs-card{border-radius:var(--radius-sm);border:1px solid var(--border);padding:12px;background:var(--white);}
+.hs-card.red{background:#FCEBEB;border-color:#E24B4A;}
+.hs-card .hs-tag{font-family:var(--font-mono);font-size:11px;font-weight:500;color:var(--ink);margin-bottom:3px;}
+.hs-card.red .hs-tag{color:#791F1F;}
+.hs-card .hs-desc{font-size:10.5px;color:var(--gray);}
+.hs-card.red .hs-desc{color:#A32D2D;}
+.dashboard{margin-top:20px;background:var(--gray-l);border:1px solid var(--gray);border-radius:var(--radius);padding:14px 20px;text-align:center;}
+.dashboard h4{font-size:13px;font-weight:600;color:var(--gray-d);margin-bottom:3px;}
+.dashboard p{font-size:11.5px;color:var(--gray);}
+.fig-caption{text-align:center;font-size:11.5px;color:var(--gray);line-height:1.7;margin-top:16px;padding-top:14px;border-top:1px solid var(--border);}
+.fig-caption strong{color:var(--ink);}
+
+/* ══ SLIDE 5 U-Net ══ */
+.unet-wrap{display:flex;flex-direction:column;align-items:center;flex:1;}
+.unet-legend{display:flex;gap:20px;flex-wrap:wrap;justify-content:center;margin-top:14px;}
+.uleg{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--gray-d);}
+.uleg-dot{width:12px;height:12px;border-radius:3px;flex-shrink:0;}
+@keyframes pulse{0%,100%{opacity:.3}50%{opacity:1}}
+.node-active{animation:pulse 1.2s ease-in-out infinite;}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════ SLIDE 1 — AlphaGo principles ═══════════════ -->
+<div class="slide-wrap">
+  <div class="slide-nav">
+    <span class="slide-counter">SLIDE 01 / 06</span>
+    <div class="slide-dots"><div class="dot on"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+  </div>
+  <div class="slide">
+    <div class="slide-badge">AlphaGo · Principles</div>
+    <div class="eyebrow">Background</div>
+    <div class="slide-title">How AlphaGo thinks</div>
+    <div class="slide-sub">Every turn: read the full 19×19 board → evaluate → place the optimal stone. Decisions accumulate over time.</div>
+    <div class="principles">
+      <div class="pcard ct"><div class="picon">⊞</div><h3>Global state evaluation</h3><p>All 361 intersections are read as a single state tensor every turn. No position is skipped or estimated.</p></div>
+      <div class="pcard cp"><div class="picon">◈</div><h3>Policy + Value network</h3><p>Policy network proposes next move candidates. Value network scores the long-term outcome of each resulting state.</p></div>
+      <div class="pcard ca"><div class="picon">↻</div><h3>Cumulative decision loop</h3><p>Each stone placed stays permanently. History accumulates — every new decision builds on all previous ones.</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ SLIDE 2 — mapping table ═══════════════ -->
+<div class="slide-wrap">
+  <div class="slide-nav">
+    <span class="slide-counter">SLIDE 02 / 06</span>
+    <div class="slide-dots"><div class="dot"></div><div class="dot on"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+  </div>
+  <div class="slide">
+    <div class="slide-badge">Mapping · Analogy</div>
+    <div class="eyebrow">Concept transfer</div>
+    <div class="slide-title">AlphaGo → this system</div>
+    <div class="slide-sub">Each AlphaGo concept maps onto the microfluidic pipeline — with one critical difference highlighted below.</div>
+    <table class="mapping-table">
+      <thead><tr><th style="width:26%">AlphaGo</th><th style="width:5%"></th><th style="width:31%">This system</th><th style="width:38%">Note</th></tr></thead>
+      <tbody>
+        <tr><td>19 × 19 board</td><td class="arrow-col">→</td><td><span class="tag purple">32 × 32 chamber array</span></td><td>1024 chambers evaluated every cycle</td></tr>
+        <tr><td>Board intersection</td><td class="arrow-col">→</td><td><span class="tag teal">Individual chamber</span></td><td>State: empty / candidate / target / occupied</td></tr>
+        <tr><td>Next move</td><td class="arrow-col">→</td><td><span class="tag coral">Valve combination</span></td><td>Optimal set from 2⁹⁶ on/off patterns</td></tr>
+        <tr><td>Policy network</td><td class="arrow-col">→</td><td><span class="tag purple">U-Net segmentation</span></td><td>Per-chamber target probability map</td></tr>
+        <tr><td>Human expert review</td><td class="arrow-col">→</td><td><span class="tag amber">Human verification</span></td><td>Approve / Reject before valve signal is sent</td></tr>
+        <tr style="background:#FAECE7"><td style="color:var(--coral-d);font-weight:600">Stones accumulate on board</td><td class="arrow-col" style="color:var(--coral)">≠</td><td><span class="tag coral">Each cycle fully independent</span></td><td style="color:var(--coral-d);font-weight:500">Chamber state resets — decision based on current snapshot only</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ═══════════════ SLIDE 3 — interactive comparison ═══════════════ -->
+<div class="slide-wrap">
+  <div class="slide-nav">
+    <span class="slide-counter">SLIDE 03 / 06</span>
+    <div class="slide-dots"><div class="dot"></div><div class="dot"></div><div class="dot on"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+  </div>
+  <div class="slide">
+    <div class="slide-badge">Interactive · Comparison</div>
+    <div class="eyebrow">Key difference</div>
+    <div class="slide-title">Cumulative vs independent decisions</div>
+    <div class="slide-sub">AlphaGo accumulates moves on the board. This system reads the biological trajectory embedded in each chamber snapshot — the current state of cells <em>is</em> the history.</div>
+
+    <div class="s3-grid">
+
+      <!-- LEFT: Go board -->
+      <div class="s3-panel go-panel">
+        <div class="s3-panel-hd">
+          <div class="s3-panel-title go">AlphaGo — cumulative</div>
+          <span class="cycle-badge go" id="goCycleTag">Move 0</span>
+        </div>
+        <div class="go-board" id="goBoard">
+          <div class="go-grid-inner" id="goGrid" style="display:grid;gap:0;"></div>
+        </div>
+        <div class="s3-stat-row">
+          <div class="s3-stat"><div class="sv" id="goBlack" style="color:#1a1a18">0</div><div class="sl">black stones</div></div>
+          <div class="s3-stat"><div class="sv" id="goWhite" style="color:#888">0</div><div class="sl">white stones</div></div>
+          <div class="s3-stat"><div class="sv" id="goTotal" style="color:var(--amber)">0</div><div class="sl">total on board</div></div>
+        </div>
+        <div class="s3-info">Click any intersection to place a stone. <strong>Stones stay permanently</strong> — the board accumulates history across every move.</div>
+        <div class="s3-btns">
+          <button class="primary" onclick="autoPlayGo()">▶ Auto play</button>
+          <button onclick="resetGo()">✕ Reset board</button>
+        </div>
+      </div>
+
+      <!-- RIGHT: Chamber array -->
+      <div class="s3-panel ch-panel">
+        <div class="s3-panel-hd">
+          <div class="s3-panel-title ch">This system — stateless</div>
+          <span class="cycle-badge ch" id="chCycleTag">Cycle 1</span>
+        </div>
+        <canvas id="chamberCanvas3" width="280" height="280" style="align-self:center;"></canvas>
+        <div class="s3-stat-row">
+          <div class="s3-stat"><div class="sv" id="ch3Targets" style="color:var(--teal)">0</div><div class="sl">targets</div></div>
+          <div class="s3-stat"><div class="sv" id="ch3Cands" style="color:var(--purple)">0</div><div class="sl">candidates</div></div>
+          <div class="s3-stat"><div class="sv" id="ch3Cycle" style="color:var(--coral)">1</div><div class="sl">cycle #</div></div>
+        </div>
+        <div class="s3-info"><strong>Each snapshot encodes biological trajectory</strong> — cell position, morphology, and occupancy reflect the cell's history. The AI reads this to decide.</div>
+        <div class="s3-btns">
+          <button class="primary" onclick="runChCycle()">▶ Next cycle</button>
+          <button id="chAutoBtn" onclick="toggleChAuto()">⟳ Auto</button>
+          <button onclick="resetChamber3()">✕ Reset</button>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="diff-callout">
+      <strong>The key distinction</strong>
+      AlphaGo's decisions are shaped by the visible history of stones on the board. This system's decisions are shaped by <em>biological trajectory</em> — the physical state of cells in each chamber at this moment already encodes their developmental history. The snapshot is not a blank slate; it is the readout of a biological process.
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ SLIDE 4 — chamber array + biological trajectory tree ═══════════════ -->
+<div class="slide-wrap">
+  <div class="slide-nav">
+    <span class="slide-counter">SLIDE 04 / 06</span>
+    <div class="slide-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot on"></div><div class="dot"></div><div class="dot"></div></div>
+  </div>
+  <div class="slide" style="padding:32px 36px;">
+    <div class="slide-badge">Biological Trajectory · Tree</div>
+    <div class="eyebrow">Cumulative branching</div>
+    <div class="slide-title">Biological trajectory accumulates across cycles</div>
+    <div class="slide-sub">Each cycle the chamber array updates — and the trajectory tree grows a new ring of branches, accumulating biological history.</div>
+
+    <div style="display:grid;grid-template-columns:auto 1fr;gap:22px;align-items:center;flex:1;">
+
+      <!-- LEFT: chamber array -->
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <div style="font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--gray);margin-bottom:2px;">32 × 32 chamber array</div>
+        <canvas id="s4ChamberCanvas" width="256" height="256" style="border-radius:8px;border:1px solid var(--purple);display:block;"></canvas>
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <span style="font-size:11px;font-family:'DM Mono',monospace;background:var(--purple-l);color:var(--purple-d);padding:3px 9px;border-radius:4px;border:1px solid var(--purple);" id="s4CycleTag">Cycle 0</span>
+          <span style="font-size:10.5px;color:var(--gray);">1024 chambers</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:4px;margin-top:2px;">
+          <div style="display:flex;align-items:center;gap:6px;font-size:10.5px;color:var(--gray-d);"><div style="width:11px;height:11px;border-radius:2px;background:#1D9E75;flex-shrink:0;"></div>Target (valve sent)</div>
+          <div style="display:flex;align-items:center;gap:6px;font-size:10.5px;color:var(--gray-d);"><div style="width:11px;height:11px;border-radius:2px;background:#7F77DD;flex-shrink:0;"></div>Candidate (AI-flagged)</div>
+          <div style="display:flex;align-items:center;gap:6px;font-size:10.5px;color:var(--gray-d);"><div style="width:11px;height:11px;border-radius:2px;background:#D85A30;flex-shrink:0;"></div>Occupied (prior)</div>
+          <div style="display:flex;align-items:center;gap:6px;font-size:10.5px;color:var(--gray-d);"><div style="width:11px;height:11px;border-radius:2px;background:#E8E6DF;border:1px solid #ccc;flex-shrink:0;"></div>Empty</div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:4px;">
+          <div style="background:#fff;border:1px solid var(--border);border-radius:6px;padding:8px 10px;text-align:center;">
+            <div style="font-size:20px;font-weight:600;color:var(--teal);" id="s4StatTargets">0</div>
+            <div style="font-size:10px;color:var(--gray);">targets</div>
+          </div>
+          <div style="background:#fff;border:1px solid var(--border);border-radius:6px;padding:8px 10px;text-align:center;">
+            <div style="font-size:20px;font-weight:600;color:var(--purple);" id="s4StatCands">0</div>
+            <div style="font-size:10px;color:var(--gray);">candidates</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:6px;margin-top:4px;flex-wrap:wrap;">
+          <button class="primary" onclick="s4NextCycle()">▶ Next cycle</button>
+          <button id="s4AutoBtn" onclick="s4ToggleAuto()">⟳ Auto</button>
+          <button onclick="s4Reset()">✕ Reset</button>
+        </div>
+      </div>
+
+      <!-- RIGHT: trajectory tree canvas -->
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <div style="font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--gray);margin-bottom:2px;">Biological trajectory tree — cumulative across cycles</div>
+        <canvas id="s4TrajCanvas" width="480" height="310" style="border-radius:8px;border:1px solid var(--border);display:block;background:#fafaf8;width:100%;max-width:480px;"></canvas>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;">
+          <div style="background:var(--teal-l);border:1px solid var(--teal);border-radius:6px;padding:8px 10px;text-align:center;">
+            <div style="font-size:20px;font-weight:600;color:var(--teal-d);" id="s4TrajActive">0</div>
+            <div style="font-size:10px;color:var(--teal);">active</div>
+          </div>
+          <div style="background:var(--purple-l);border:1px solid var(--purple);border-radius:6px;padding:8px 10px;text-align:center;">
+            <div style="font-size:20px;font-weight:600;color:var(--purple-d);" id="s4TrajBranches">0</div>
+            <div style="font-size:10px;color:var(--purple);">branches</div>
+          </div>
+          <div style="background:var(--coral-l);border:1px solid var(--coral);border-radius:6px;padding:8px 10px;text-align:center;">
+            <div style="font-size:20px;font-weight:600;color:var(--coral-d);" id="s4TrajDecided">0</div>
+            <div style="font-size:10px;color:var(--coral);">decided</div>
+          </div>
+        </div>
+        <!-- tree legend -->
+        <div style="display:flex;gap:14px;flex-wrap:wrap;margin-top:2px;">
+          <div style="display:flex;align-items:center;gap:6px;font-size:10.5px;color:var(--gray-d);"><div style="width:20px;height:2px;background:#1D9E75;border-radius:1px;"></div>Active</div>
+          <div style="display:flex;align-items:center;gap:6px;font-size:10.5px;color:var(--gray-d);"><div style="width:20px;height:2px;background:#7F77DD;border-radius:1px;"></div>Branching</div>
+          <div style="display:flex;align-items:center;gap:6px;font-size:10.5px;color:var(--gray-d);"><div style="width:20px;height:2px;background:#D85A30;border-radius:1px;"></div>Decided</div>
+          <div style="display:flex;align-items:center;gap:6px;font-size:10.5px;color:var(--gray-d);"><div style="width:20px;height:2px;background:#ccc;border-radius:1px;"></div>Pruned</div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="callout-bar" style="margin-top:14px;">
+      <strong>Biological trajectory — </strong>
+      Each cycle, the chamber array is re-read and the trajectory tree gains a new ring of branches. Diverging biological paths accumulate across cycles — converging toward a valve decision only when the trajectory is sufficiently resolved.
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ SLIDE 5 — Figure 2 (from microfluidic_interactive) ═══════════════ -->
+<div class="slide-wrap">
+  <div class="slide-nav">
+    <span class="slide-counter">SLIDE 05 / 06</span>
+    <div class="slide-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot on"></div><div class="dot"></div></div>
+  </div>
+  <div class="slide">
+    <div class="slide-badge">State space · AlphaGo analogy</div>
+    <div class="eyebrow">Figure 2</div>
+    <div class="slide-title">1024-chamber state space</div>
+    <div class="slide-sub">Each feedback cycle evaluates the complete 32×32 array and emits the optimal valve-control signal via PC3.</div>
+
+    <!-- analogy row -->
+    <div class="analogy-row">
+      <div class="analogy-panel left">
+        <h3>AlphaGo</h3>
+        <div class="big">19 × 19 board</div>
+        <ul>
+          <li>361 intersections</li>
+          <li>~10¹⁷⁰ possible positions</li>
+          <li class="key">Every turn:</li>
+          <li>Evaluate full board state</li>
+          <li>→ Select optimal next move</li>
+        </ul>
+      </div>
+      <div class="vs-badge">≈</div>
+      <div class="analogy-panel right">
+        <h3>This system</h3>
+        <div class="big">32 × 32 chamber array</div>
+        <ul>
+          <li>1024 chambers</li>
+          <li>2⁹⁶ valve combinations</li>
+          <li class="key">Every cycle:</li>
+          <li>Evaluate full array state</li>
+          <li>→ Select optimal valve set</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- loop steps -->
+    <div class="loop-steps" id="s5LoopSteps">
+      <div class="loop-step s1"><div class="num">1</div><h4>Imaging</h4><p>Z-stack .tif</p></div>
+      <div class="loop-step s2"><div class="num">2</div><h4>AI analysis</h4><p>U-Net seg.</p></div>
+      <div class="loop-step s3"><div class="num">3</div><h4>Human review</h4><p>Approve / reject</p></div>
+      <div class="loop-step s4"><div class="num">4</div><h4>Valve select</h4><p>Optimal set</p></div>
+      <div class="loop-step s5"><div class="num">5</div><h4>Execute</h4><p>↻ next cycle</p></div>
+    </div>
+
+    <div class="cycle-label" id="s5CycleLabel">Cycle 1 — click a chamber to toggle state, or press Simulate</div>
+
+    <div class="grid-section">
+      <canvas id="s5Canvas" width="256" height="256" style="display:block;cursor:crosshair;border-radius:var(--radius-sm);border:1px solid var(--border);"></canvas>
+      <div>
+        <div class="legend">
+          <div class="leg"><div class="leg-dot" style="background:#1D9E75"></div>Target (valve signal sent)</div>
+          <div class="leg"><div class="leg-dot" style="background:#7F77DD"></div>Candidate (AI-flagged)</div>
+          <div class="leg"><div class="leg-dot" style="background:#D85A30"></div>Occupied (prior cycle)</div>
+          <div class="leg"><div class="leg-dot" style="background:#E8E6DF;border:1px solid #ccc"></div>Empty</div>
+        </div>
+        <div class="stat-card"><div class="s-label">Selected targets</div><div class="s-val teal-val" id="s5StatTargets">0</div><div class="s-sub">valve signal sent to PC3</div></div>
+        <div class="stat-card"><div class="s-label">Candidates detected</div><div class="s-val purple-val" id="s5StatCands">0</div><div class="s-sub">AI-flagged this cycle</div></div>
+        <div class="stat-card"><div class="s-label">Total chambers</div><div class="s-val" style="font-size:18px">1024 <span style="font-size:12px;color:var(--gray);font-weight:400">(32×32)</span></div><div class="s-sub">2⁹⁶ valve combinations</div></div>
+        <div class="btn-row">
+          <button class="primary" onclick="s5Simulate()">▶ Simulate cycle</button>
+          <button id="s5LoopBtn" onclick="s5ToggleLoop()">⟳ Auto loop</button>
+          <button class="danger" onclick="s5ClearGrid()">✕ Clear</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout">
+      <strong>AlphaGo analogy</strong>
+      <p>Just as AlphaGo evaluates every intersection on the 19×19 board before selecting the optimal next move, this system evaluates all 1024 chambers each feedback cycle and emits the optimal valve-control signal via PC3 — without requiring manual chamber-by-chamber inspection.</p>
+    </div>
+
+    <div class="fig-caption">
+      <strong>Fig. 2</strong> 1024-chamber state-space analogy. Each feedback cycle evaluates the complete 32×32 array (cf. AlphaGo's board-wide search) and emits the optimal valve-control signal via PC3.
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ SLIDE 6 — pipeline (uploaded Figure 1) ═══════════════ -->
+<div class="slide-wrap">
+  <div class="slide-nav">
+    <span class="slide-counter">SLIDE 06 / 06</span>
+    <div class="slide-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot on"></div></div>
+  </div>
+  <div class="slide">
+    <div class="slide-badge">System · Pipeline</div>
+    <div class="eyebrow">Implementation</div>
+    <div class="slide-title">Real-time closed-loop control pipeline</div>
+    <div class="slide-sub">Three-PC architecture with file-based handshake — PC1 acquires, PC2 analyses, PC3 controls.</div>
+
+    <div class="pc-row">
+      <div class="pc-box teal"><h3>PC 1</h3><div class="role">Data acquisition</div><ul><li>Microscope + high-speed camera</li><li>Z-stack 512ch</li><li>Saves Raw .tif to Tank Folder</li></ul></div>
+      <div class="pc-connector"><span class="file-tag">Raw .tif</span><div class="arrow-line"></div><span class="file-tag">PC1_Ready.txt</span></div>
+      <div class="pc-box purple"><h3>PC 2</h3><div class="role">AI analysis</div><ul><li>MIP → U-Net → Mapping</li><li>Human review → CSV</li><li>Generates Done.flag on approval</li></ul></div>
+      <div class="pc-connector"><span class="file-tag">Harvest_List.csv</span><div class="arrow-line"></div><span class="file-tag">Done.flag</span></div>
+      <div class="pc-box coral"><h3>PC 3</h3><div class="role">Physical control</div><ul><li>CH512 · 96 valves</li><li>1024 chambers</li><li>Timer-based auto-polling</li></ul></div>
+    </div>
+
+    <div class="pipeline">
+      <div class="pipe-step teal"><div class="step-num">01</div><h4>Imaging</h4><p>Microscope + camera Z-stack .tif</p></div>
+      <div class="pipe-step teal"><div class="step-num">02</div><h4>Watchdog</h4><p>Copy .tif → Tank Folder sync</p></div>
+      <div class="pipe-step purple"><div class="step-num">03</div><h4>AI analysis</h4><p>U-Net segmentation valve mapping</p></div>
+      <div class="pipe-step amber"><div class="step-num">04</div><h4>Human review</h4><p>Approve / Reject targets</p></div>
+      <div class="pipe-step coral"><div class="step-num">05</div><h4>Valve control</h4><p>CH512 auto-run sequence</p></div>
+    </div>
+
+    <div class="feedback-arc">↻ feedback: chamber state → next imaging cycle</div>
+
+    <div class="handshake">
+      <div class="hs-card"><div class="hs-tag">PC1_Ready.txt</div><div class="hs-desc">Sync complete signal</div></div>
+      <div class="hs-card"><div class="hs-tag">Harvest_List.csv</div><div class="hs-desc">Target coordinates</div></div>
+      <div class="hs-card"><div class="hs-tag">Done.flag</div><div class="hs-desc">Approved → run valve</div></div>
+      <div class="hs-card"><div class="hs-tag">E-Stop</div><div class="hs-desc">Emergency halt · all nodes</div></div>
+    </div>
+
+    <div class="dashboard"><h4>Central dashboard</h4><p>Heartbeat · E-Stop · Alerts · System log</p></div>
+
+    <div class="fig-caption">
+      <strong>Fig. 1</strong> Three-PC closed-loop microfluidic control pipeline. PC1 acquires Z-stack images; PC2 runs AI segmentation and human verification; PC3 executes valve control. File-based handshake synchronises all nodes.
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════ JAVASCRIPT ═══════════════ -->
+<script>
+// ══════════════════════════════════════════
+//  SLIDE 3 — Interactive Go board
+// ══════════════════════════════════════════
+const GO_SIZE = 9;
+const CELL_PX = 30; // cell size in pixels
+let goBoard = new Array(GO_SIZE * GO_SIZE).fill(0); // 0=empty 1=black 2=white
+let goMoveCount = 0;
+let goAutoTimer = null;
+let nextColor = 1; // alternate black/white
+
+function buildGoGrid() {
+  const grid = document.getElementById('goGrid');
+  const boardEl = document.getElementById('goBoard');
+  const total = GO_SIZE * CELL_PX + 20;
+  boardEl.style.width = total + 'px';
+  grid.style.gridTemplateColumns = `repeat(${GO_SIZE}, ${CELL_PX}px)`;
+  grid.style.width = (GO_SIZE * CELL_PX) + 'px';
+  grid.style.height = (GO_SIZE * CELL_PX) + 'px';
+  grid.style.margin = '10px auto';
+  grid.style.position = 'relative';
+  grid.innerHTML = '';
+
+  // draw grid lines via SVG background
+  const linesSvg = document.createElementNS('http://www.w3.org/2000/svg','svg');
+  linesSvg.style.cssText = `position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;`;
+  linesSvg.setAttribute('viewBox',`0 0 ${GO_SIZE*CELL_PX} ${GO_SIZE*CELL_PX}`);
+  for(let i=0;i<GO_SIZE;i++){
+    const x = i*CELL_PX + CELL_PX/2;
+    const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+    line.setAttribute('x1',x);line.setAttribute('y1',CELL_PX/2);
+    line.setAttribute('x2',x);line.setAttribute('y2',GO_SIZE*CELL_PX - CELL_PX/2);
+    line.setAttribute('stroke','rgba(0,0,0,0.35)');line.setAttribute('stroke-width','1');
+    linesSvg.appendChild(line);
+    const line2 = document.createElementNS('http://www.w3.org/2000/svg','line');
+    line2.setAttribute('x1',CELL_PX/2);line2.setAttribute('y1',x);
+    line2.setAttribute('x2',GO_SIZE*CELL_PX-CELL_PX/2);line2.setAttribute('y2',x);
+    line2.setAttribute('stroke','rgba(0,0,0,0.35)');line2.setAttribute('stroke-width','1');
+    linesSvg.appendChild(line2);
+  }
+  grid.appendChild(linesSvg);
+
+  for(let i=0;i<GO_SIZE*GO_SIZE;i++){
+    const cell = document.createElement('div');
+    cell.className = 'go-cell-wrap';
+    cell.style.cssText = `width:${CELL_PX}px;height:${CELL_PX}px;position:relative;z-index:1;`;
+    cell.dataset.idx = i;
+    const stone = document.createElement('div');
+    stone.className = 'go-stone empty';
+    stone.id = 'go-stone-'+i;
+    cell.appendChild(stone);
+    cell.addEventListener('click', () => placeStone(i));
+    grid.appendChild(cell);
+  }
+}
+
+function placeStone(idx) {
+  if(goBoard[idx] !== 0) return;
+  goBoard[idx] = nextColor;
+  goMoveCount++;
+  const stone = document.getElementById('go-stone-'+idx);
+  stone.className = 'go-stone ' + (nextColor===1 ? 'new-b' : 'new-w');
+  // remove highlight from previous new stones
+  document.querySelectorAll('.go-stone.new-b, .go-stone.new-w').forEach(s => {
+    if(s.id !== 'go-stone-'+idx){
+      s.className = 'go-stone ' + (goBoard[parseInt(s.id.replace('go-stone-',''))]===1?'black':'white');
+    }
+  });
+  nextColor = nextColor === 1 ? 2 : 1;
+  updateGoStats();
+}
+
+function updateGoStats(){
+  const black = goBoard.filter(v=>v===1).length;
+  const white = goBoard.filter(v=>v===2).length;
+  document.getElementById('goBlack').textContent = black;
+  document.getElementById('goWhite').textContent = white;
+  document.getElementById('goTotal').textContent = black+white;
+  document.getElementById('goCycleTag').textContent = 'Move '+goMoveCount;
+}
+
+function autoPlayGo(){
+  if(goAutoTimer){ clearInterval(goAutoTimer); goAutoTimer=null; return; }
+  goAutoTimer = setInterval(()=>{
+    const empties = goBoard.map((v,i)=>v===0?i:-1).filter(i=>i>=0);
+    if(empties.length===0){ clearInterval(goAutoTimer); goAutoTimer=null; return; }
+    placeStone(empties[Math.floor(Math.random()*empties.length)]);
+  }, 400);
+}
+
+function resetGo(){
+  if(goAutoTimer){clearInterval(goAutoTimer);goAutoTimer=null;}
+  goBoard = new Array(GO_SIZE*GO_SIZE).fill(0);
+  goMoveCount=0; nextColor=1;
+  buildGoGrid(); updateGoStats();
+}
+
+// ══════════════════════════════════════════
+//  SLIDE 3 — Chamber canvas (stateless)
+// ══════════════════════════════════════════
+const C3 = 32, CELL3 = 280/32;
+const cv3 = document.getElementById('chamberCanvas3');
+const ctx3 = cv3.getContext('2d');
+const st3 = new Uint8Array(C3*C3);
+let ch3CycleNum = 1;
+const CC3 = {0:'#EAE8E0',1:'#1D9E75',2:'#7F77DD',3:'#D85A30'};
+
+function draw3(){
+  for(let r=0;r<C3;r++) for(let c=0;c<C3;c++){
+    ctx3.fillStyle=CC3[st3[r*C3+c]];
+    ctx3.fillRect(c*CELL3,r*CELL3,CELL3-0.5,CELL3-0.5);
+  }
+  let t=0,ca=0;
+  st3.forEach(v=>{if(v===1)t++;if(v===2)ca++;});
+  document.getElementById('ch3Targets').textContent=t;
+  document.getElementById('ch3Cands').textContent=ca;
+}
+
+cv3.addEventListener('click',e=>{
+  const rect=cv3.getBoundingClientRect();
+  const sx=cv3.width/rect.width,sy=cv3.height/rect.height;
+  const c=Math.floor((e.clientX-rect.left)*sx/CELL3);
+  const r=Math.floor((e.clientY-rect.top)*sy/CELL3);
+  if(c<0||c>=C3||r<0||r>=C3)return;
+  const idx=r*C3+c;
+  st3[idx]=(st3[idx]+1)%4;
+  draw3();
+});
+
+function runChCycle(){
+  // WIPE everything — stateless
+  st3.fill(0);
+  ch3CycleNum++;
+  document.getElementById('ch3Cycle').textContent=ch3CycleNum;
+  document.getElementById('chCycleTag').textContent='Cycle '+ch3CycleNum;
+  // scatter fresh candidates
+  const nC=Math.floor(Math.random()*14)+6;
+  let p=0;
+  while(p<nC){const idx=Math.floor(Math.random()*st3.length);if(st3[idx]===0){st3[idx]=2;p++;}}
+  // some targets
+  const nT=Math.floor(Math.random()*5)+2;
+  let conv=0;
+  for(let i=0;i<st3.length&&conv<nT;i++)if(st3[i]===2){st3[i]=1;conv++;}
+  draw3();
+}
+
+function resetChamber3(){
+  if(ch3AutoTimer){clearInterval(ch3AutoTimer);ch3AutoTimer=null;document.getElementById('chAutoBtn').textContent='⟳ Auto';}
+  st3.fill(0); ch3CycleNum=1;
+  document.getElementById('ch3Cycle').textContent=1;
+  document.getElementById('chCycleTag').textContent='Cycle 1';
+  draw3();
+}
+
+let ch3AutoTimer = null;
+function toggleChAuto(){
+  const btn = document.getElementById('chAutoBtn');
+  if(ch3AutoTimer){ clearInterval(ch3AutoTimer); ch3AutoTimer=null; btn.textContent='⟳ Auto'; }
+  else{ btn.textContent='⏹ Stop'; ch3AutoTimer=setInterval(()=>runChCycle(), 900); runChCycle(); }
+}
+
+// ══════════════════════════════════════════
+//  SLIDE 4 — Chamber array + Trajectory tree
+// ══════════════════════════════════════════
+const S4_COLS=32, S4_ROWS=32, S4_CELL=8;
+const s4cv = document.getElementById('s4ChamberCanvas');
+const s4ctx = s4cv.getContext('2d');
+const s4state = new Uint8Array(S4_COLS*S4_ROWS);
+const S4_CC = {0:'#E8E6DF',1:'#1D9E75',2:'#7F77DD',3:'#D85A30'};
+let s4cycle = 0, s4autoTimer = null;
+
+function s4DrawChamber(){
+  s4ctx.fillStyle = '#E8E6DF';
+  s4ctx.fillRect(0, 0, S4_COLS*S4_CELL, S4_ROWS*S4_CELL);
+  for(let r=0;r<S4_ROWS;r++) for(let c=0;c<S4_COLS;c++){
+    s4ctx.fillStyle = S4_CC[s4state[r*S4_COLS+c]];
+    s4ctx.fillRect(c*S4_CELL, r*S4_CELL, S4_CELL-1, S4_CELL-1);
+  }
+  let t=0,ca=0;
+  s4state.forEach(v=>{if(v===1)t++;if(v===2)ca++;});
+  document.getElementById('s4StatTargets').textContent = t;
+  document.getElementById('s4StatCands').textContent = ca;
+}
+
+// ── Trajectory tree ──
+// node: {id, parentId, cycle, state, px, py}
+// state: 'active' | 'decided' | 'pruned'
+let s4nodes = [], s4nodeId = 0;
+
+const S4_TW = 480, S4_TH = 310;
+const S4_ML = 30, S4_MT = 18;
+// cycle step shrinks as tree grows to keep everything visible
+function s4CycleStep(){ return Math.max(28, Math.floor((S4_TW - S4_ML - 16) / Math.max(s4cycle, 1))); }
+
+const S4_COLORS = { active:'#1D9E75', decided:'#D85A30', pruned:'#c8c6c0' };
+
+function s4InitTree(){
+  s4nodes = []; s4nodeId = 0;
+  s4nodes.push({id:s4nodeId++, parentId:null, cycle:0, state:'active'});
+}
+
+function s4TreeLayout(){
+  const step = s4CycleStep();
+  const usableH = S4_TH - S4_MT*2;
+  // group by cycle
+  const byCycle = {};
+  s4nodes.forEach(n=>{ if(!byCycle[n.cycle]) byCycle[n.cycle]=[]; byCycle[n.cycle].push(n); });
+  Object.keys(byCycle).forEach(cyc=>{
+    const arr = byCycle[cyc];
+    arr.forEach((n,i)=>{
+      n.px = S4_ML + Number(cyc) * step;
+      n.py = arr.length===1
+        ? S4_MT + usableH/2
+        : S4_MT + i * usableH / (arr.length - 1);
+    });
+  });
+}
+
+function s4DrawTraj(){
+  const cvs = document.getElementById('s4TrajCanvas');
+  const ctx = cvs.getContext('2d');
+  ctx.clearRect(0,0,S4_TW,S4_TH);
+  s4TreeLayout();
+  const step = s4CycleStep();
+
+  // cycle column guides
+  for(let cy=0; cy<=s4cycle; cy++){
+    const x = S4_ML + cy*step;
+    ctx.save();
+    ctx.strokeStyle='rgba(0,0,0,0.06)'; ctx.lineWidth=1; ctx.setLineDash([3,4]);
+    ctx.beginPath(); ctx.moveTo(x,8); ctx.lineTo(x,S4_TH-6); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle='rgba(0,0,0,0.22)';
+    ctx.font='8px "DM Mono",monospace'; ctx.textAlign='center';
+    ctx.fillText('c'+cy, x, 8);
+    ctx.restore();
+  }
+
+  // edges
+  s4nodes.forEach(n=>{
+    if(n.parentId===null) return;
+    const par = s4nodes.find(p=>p.id===n.parentId);
+    if(!par) return;
+    ctx.save();
+    ctx.strokeStyle = S4_COLORS[n.state]||'#ccc';
+    ctx.lineWidth = n.state==='active' ? 2 : 1.5;
+    ctx.globalAlpha = n.state==='pruned' ? 0.28 : 0.82;
+    if(n.state==='pruned') ctx.setLineDash([3,4]);
+    ctx.beginPath();
+    ctx.moveTo(par.px, par.py);
+    const mx=(par.px+n.px)/2;
+    ctx.bezierCurveTo(mx,par.py,mx,n.py,n.px,n.py);
+    ctx.stroke();
+    ctx.restore();
+  });
+
+  // nodes
+  s4nodes.forEach(n=>{
+    ctx.save();
+    ctx.globalAlpha = n.state==='pruned' ? 0.32 : 1;
+    ctx.fillStyle = S4_COLORS[n.state]||'#ccc';
+    ctx.beginPath(); ctx.arc(n.px, n.py, n.state==='decided'?6:4.5, 0, Math.PI*2); ctx.fill();
+    if(n.state!=='pruned'){
+      ctx.strokeStyle='rgba(255,255,255,0.85)'; ctx.lineWidth=1.5; ctx.stroke();
+    }
+    // decided: small ✓ dot
+    if(n.state==='decided'){
+      ctx.fillStyle='#fff'; ctx.font='bold 7px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.fillText('✓', n.px, n.py);
+    }
+    ctx.restore();
+  });
+
+  const active  = s4nodes.filter(n=>n.state==='active').length;
+  const branches= s4nodes.filter(n=>n.parentId!==null).length;
+  const decided = s4nodes.filter(n=>n.state==='decided').length;
+  document.getElementById('s4TrajActive').textContent   = active;
+  document.getElementById('s4TrajBranches').textContent = branches;
+  document.getElementById('s4TrajDecided').textContent  = decided;
+}
+
+function s4GrowTree(){
+  const maxCycle = Math.max(...s4nodes.map(n=>n.cycle));
+  const newCycle = maxCycle + 1;
+  // total active leaves at frontier
+  const leaves = s4nodes.filter(n=>n.cycle===maxCycle && n.state==='active');
+  const totalActive = leaves.length;
+  const MAX_NODES_PER_CYCLE = 14; // cap so canvas doesn't overflow
+
+  leaves.forEach(leaf=>{
+    if(totalActive >= MAX_NODES_PER_CYCLE){
+      // too crowded — just extend straight or decide
+      const r = Math.random();
+      if(r < 0.3){ leaf.state='decided'; }
+      else { s4nodes.push({id:s4nodeId++, parentId:leaf.id, cycle:newCycle, state:'active'}); }
+      return;
+    }
+    // Normal branching — each active leaf splits into 2 children
+    const nBranch = Math.random()<0.15 ? 3 : 2; // occasionally 3-way
+    for(let b=0; b<nBranch; b++){
+      const r=Math.random();
+      let childState;
+      if(r < 0.12)       childState = 'decided';
+      else if(r < 0.18)  childState = 'pruned';
+      else               childState = 'active';
+      s4nodes.push({id:s4nodeId++, parentId:leaf.id, cycle:newCycle, state:childState});
+    }
+    // mark parent as an internal branch node (keep state active for color; just visual)
+    // (we don't change state here — parent stays 'active'; children determine tree shape)
+  });
+
+  // If zero active leaves (all decided/pruned early), plant a fresh root shoot
+  const stillActive = s4nodes.filter(n=>n.state==='active' && n.cycle===newCycle);
+  if(stillActive.length===0){
+    s4nodes.push({id:s4nodeId++, parentId:null, cycle:newCycle, state:'active'});
+  }
+}
+
+const S4_MAX_CYCLES = 15;
+
+function s4NextCycle(){
+  // If at max, reset and restart (for auto loop) or just stop
+  if(s4cycle >= S4_MAX_CYCLES){
+    // soft reset — keep auto timer running
+    s4cycle = 0;
+    s4state.fill(0);
+    s4DrawChamber();
+    document.getElementById('s4CycleTag').textContent = 'Cycle 0';
+    s4InitTree();
+    s4DrawTraj();
+    return;
+  }
+
+  s4cycle++;
+  document.getElementById('s4CycleTag').textContent = 'Cycle '+s4cycle;
+
+  // Update chamber array — targets → occupied, clear rest, scatter new
+  for(let i=0;i<s4state.length;i++){
+    if(s4state[i]===1) s4state[i]=3;
+    else if(s4state[i]===2||s4state[i]===3) s4state[i]=0;
+  }
+  const nC = Math.floor(Math.random()*14)+6;
+  let p=0;
+  while(p<nC){const idx=Math.floor(Math.random()*s4state.length);if(s4state[idx]===0){s4state[idx]=2;p++;}}
+  const nT = Math.floor(Math.random()*6)+2;
+  let conv=0;
+  for(let i=0;i<s4state.length&&conv<nT;i++) if(s4state[i]===2){s4state[i]=1;conv++;}
+
+  s4DrawChamber();
+  s4GrowTree();
+  s4DrawTraj();
+}
+
+function s4ToggleAuto(){
+  const btn = document.getElementById('s4AutoBtn');
+  if(s4autoTimer){ clearInterval(s4autoTimer); s4autoTimer=null; btn.textContent='⟳ Auto'; }
+  else{ btn.textContent='⏹ Stop'; s4autoTimer=setInterval(()=>s4NextCycle(), 1200); s4NextCycle(); }
+}
+
+function s4Reset(){
+  if(s4autoTimer){clearInterval(s4autoTimer);s4autoTimer=null;document.getElementById('s4AutoBtn').textContent='⟳ Auto';}
+  s4cycle=0;
+  s4state.fill(0);
+  s4DrawChamber();
+  document.getElementById('s4CycleTag').textContent='Cycle 0';
+  s4InitTree();
+  s4DrawTraj();
+}
+
+// ══════════════════════════════════════════
+//  SLIDE 5 — Figure 2: chamber grid + loop sim
+// ══════════════════════════════════════════
+(function(){
+  const COLS=32, ROWS=32, CELL=8;
+  const canvas = document.getElementById('s5Canvas');
+  const ctx    = canvas.getContext('2d');
+  const state  = new Uint8Array(COLS*ROWS);
+  const COLORS = {0:'#E8E6DF',1:'#1D9E75',2:'#7F77DD',3:'#D85A30'};
+  let cycle=1, loopTimer=null, busy=false;
+
+  function draw(){
+    for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++){
+      ctx.fillStyle=COLORS[state[r*COLS+c]];
+      ctx.fillRect(c*CELL,r*CELL,CELL-1,CELL-1);
+    }
+    let t=0,ca=0;
+    state.forEach(v=>{if(v===1)t++;if(v===2)ca++;});
+    document.getElementById('s5StatTargets').textContent=t;
+    document.getElementById('s5StatCands').textContent=ca;
+  }
+
+  canvas.addEventListener('click',e=>{
+    const rect=canvas.getBoundingClientRect();
+    const sx=canvas.width/rect.width, sy=canvas.height/rect.height;
+    const c=Math.floor((e.clientX-rect.left)*sx/CELL);
+    const r=Math.floor((e.clientY-rect.top)*sy/CELL);
+    if(c<0||c>=COLS||r<0||r>=ROWS)return;
+    const idx=r*COLS+c; state[idx]=(state[idx]+1)%4; draw();
+  });
+
+  function setStep(s){
+    document.querySelectorAll('#s5LoopSteps .loop-step').forEach((el,i)=>el.classList.toggle('active',i===s));
+  }
+  function setLabel(txt){ document.getElementById('s5CycleLabel').textContent=txt; }
+
+  window.s5Simulate=function(){
+    if(busy)return; busy=true; cycle++;
+    setLabel('Cycle '+cycle+' — AI scanning all 1024 chambers...'); setStep(1);
+    setTimeout(()=>{
+      for(let i=0;i<state.length;i++) if(state[i]===2||state[i]===3) state[i]=0;
+      const nC=Math.floor(Math.random()*16)+8; let p=0;
+      while(p<nC){const idx=Math.floor(Math.random()*state.length);if(state[idx]===0){state[idx]=2;p++;}}
+      draw(); setLabel('Cycle '+cycle+' — Human review: approving targets...'); setStep(2);
+      setTimeout(()=>{
+        const nT=Math.floor(Math.random()*7)+3; let conv=0;
+        for(let i=0;i<state.length&&conv<nT;i++) if(state[i]===2){state[i]=1;conv++;}
+        draw(); setLabel('Cycle '+cycle+' — Valve signals sent to PC3...'); setStep(3);
+        setTimeout(()=>{
+          for(let i=0;i<state.length;i++) if(state[i]===2) state[i]=3;
+          draw(); setLabel('Cycle '+cycle+' — Executing. Loop ↻'); setStep(4);
+          setTimeout(()=>{setLabel('Cycle '+(cycle+1)+' ready — press Simulate or Auto loop');setStep(0);busy=false;},800);
+        },700);
+      },900);
+    },700);
+  };
+
+  window.s5ToggleLoop=function(){
+    const btn=document.getElementById('s5LoopBtn');
+    if(loopTimer){clearInterval(loopTimer);loopTimer=null;btn.textContent='⟳ Auto loop';}
+    else{btn.textContent='⏹ Stop loop';loopTimer=setInterval(()=>s5Simulate(),4200);s5Simulate();}
+  };
+
+  window.s5ClearGrid=function(){
+    if(loopTimer){clearInterval(loopTimer);loopTimer=null;document.getElementById('s5LoopBtn').textContent='⟳ Auto loop';}
+    state.fill(0);cycle=1;busy=false;draw();setStep(-1);
+    setLabel('Cycle 1 — click a chamber to toggle state, or press Simulate');
+  };
+
+  draw();
+})();
+
+// ── init ──
+buildGoGrid(); updateGoStats();
+draw3();
+s4InitTree(); s4DrawChamber(); s4DrawTraj();
+</script>
+</body>
+</html>
